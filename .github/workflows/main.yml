@@ -14,5 +14,5 @@ jobs:
         server:  http://172.20.21.201/
         username: aurelien
         password: ${{ secrets.ftp_password }}
-        port: 22 # todo replace with your web hosts ftps port
+        port: 21 # todo replace with your web hosts ftps port
         server-dir: public_html/M07W/
