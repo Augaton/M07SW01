@@ -122,6 +122,37 @@
         break;
     case "GET":
 
+        // recup données
+
+        if(isset($req_data[1])&&$req_data[1]=='drone') {
+            $req = "SELECT * FROM drone";
+
+            $res=$connect->prepare($req, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+            $res->execute(NULL);
+            $data = $res->fetchAll(PDO::FETCH_ASSOC);
+            $data_json = json_encode($data);
+            print_r($data_json);
+        }
+        if(isset($req_data[1])&&$req_data[1]=='vol') {
+            $req = "SELECT * FROM vol";
+
+            $res=$connect->prepare($req, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+            $res->execute(NULL);
+            $data = $res->fetchAll(PDO::FETCH_ASSOC);
+            $data_json = json_encode($data);
+            print_r($data_json);
+        }
+        if(isset($req_data[1])&&$req_data[1]=='utilisateur') {
+            $req = "SELECT * FROM utilisateur";
+
+            $res=$connect->prepare($req, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+            $res->execute(NULL);
+            $data = $res->fetchAll(PDO::FETCH_ASSOC);
+            $data_json = json_encode($data);
+            print_r($data_json);
+        }
+
+
         // récup count
 
         if(isset($req_data[1])&&$req_data[1]=='nbdrone') {

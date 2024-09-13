@@ -3,6 +3,9 @@ document.getElementById("nav_suivi").addEventListener("click", suiviAjax);
 // principal
 
 function suiviAjax(){
+    
+    // nombre
+    
     const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
@@ -16,6 +19,69 @@ function suiviAjax(){
 
         var nbutilisateur=recupererNombreUtilisateur();
         document.getElementsByClassName("statistique_valeur")[2].innerHTML = nbutilisateur;
+
+        //
+
+        var reponseAPI = recupererDonneesDrones();
+
+        // table drone
+
+        var table="<div ><table class='tableau_statistique '><tr class='centrer'><th >Numéro drône</th><th>Marque</th><th>Modèle</th><th>Référence</th><th>Dateachat</th><th>Action</th></tr>";
+        for(let i=0;i < reponseAPI.length;i++){
+        table+="<tr class='centrer'>";
+        let donneesDrone=reponseAPI[i];
+        table+="<td class='idgris'>"+donneesDrone.iddrone+"</td>";
+        table+="<td>"+donneesDrone.marque+"</td>";
+        table+="<td>"+donneesDrone.modele+"</td>";
+        table+="<td>"+donneesDrone.refdrone+"</td>";
+        table+="<td>"+donneesDrone.dateachat+"</td>";
+        table+="<td>"+donneesDrone.dronecoll+"</td>";
+        table+="</tr>";
+        }
+        table+="</table></div>";
+
+        document.getElementById("section").innerHTML=table;
+
+        //
+
+        var reponseAPI = recupererDonneesVols();
+
+        // table vol
+
+        var table="<div ><table class='tableau_statistique '><tr class='centrer'><th >Numéro Vol</th><th>Date de vol</th><th >Numéro drône</th><th >Numéro Utilisateur</th></tr>";
+        for(let i=0;i < reponseAPI.length;i++){
+        table+="<tr class='centrer'>";
+        let donneesVol=reponseAPI[i];
+        table+="<td class='idgris'>"+donneesVol.idvol+"</td>";
+        table+="<td>"+donneesVol.datevol+"</td>";
+        table+="<td class='idgris'>"+donneesVol.iddrone+"</td>";
+        table+="<td class='idgris'>"+donneesVol.idutilisateurs+"</td>";
+        table+="</tr>";
+        }
+        table+="</table></div>";
+        document.getElementById("section").innerHTML=table;
+
+        //
+
+        var reponseAPI = recupererDonneesUtilisateur();
+
+        // table utilisateur
+
+        var table="<div ><table class='tableau_statistique '><tr class='centrer'><th >Numéro Utilisateur</th><th>Nom</th><th>Prénom</th><th>Email</th><th>Date de naissance</th><th>Pseudo</th></tr>";
+        for(let i=0;i < reponseAPI.length;i++){
+        table+="<tr class='centrer'>";
+        let donneesUtilisateur=reponseAPI[i];
+        table+="<td class='idgris'>"+donneesUtilisateur.idutilisateur+"</td>";
+        table+="<td>"+donneesUtilisateur.nom+"</td>";
+        table+="<td>"+donneesUtilisateur.prenom+"</td>";
+        table+="<td>"+donneesUtilisateur.email+"</td>";
+        table+="<td>"+donneesUtilisateur.naissance+"</td>";
+        table+="<td>"+donneesUtilisateur.pseudo+"</td>";
+        table+="</tr>";
+        }
+        table+="</table></div>";
+        document.getElementById("section").innerHTML=table;
+        
     }
     };
     xhttp.open("GET", "mainDrone.html");
@@ -62,6 +128,48 @@ function recupererNombreUtilisateur(){
     }
     };
     xhttp.open("GET", "rest.php/nbutilisateur",false);
+    xhttp.send();
+    return xhttp.onreadystatechange();
+}
+
+function recupererDonneesDrones(){
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var reponse = JSON.parse(this.responseText);
+
+        return reponse;
+    }
+    };
+    xhttp.open("GET", "rest.php/drone",false);
+    xhttp.send();
+    return xhttp.onreadystatechange();
+}
+
+function recupererDonneesVols(){
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var reponse = JSON.parse(this.responseText);
+
+        return reponse;
+    }
+    };
+    xhttp.open("GET", "rest.php/vol",false);
+    xhttp.send();
+    return xhttp.onreadystatechange();
+}
+
+function recupererDonneesUtilisateur(){
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var reponse = JSON.parse(this.responseText);
+
+        return reponse;
+    }
+    };
+    xhttp.open("GET", "rest.php/utilisateur",false);
     xhttp.send();
     return xhttp.onreadystatechange();
 }
