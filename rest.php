@@ -133,11 +133,21 @@
             $data_json = json_encode($data);
             print_r($data_json);
         }
-        if(isset($req_data[1])&&$req_data[1]=='vol') {
-            $req = "SELECT * FROM vol";
+        if(isset($req_data[1])&&$req_data[1]=='graphe') {
+            if(!isset($req_data[2])) {
+                print_r('Manque ID');
+                break;
+            }
+
+            if (isset($req_data[3])){
+                $req = 'SELECT '. $req_data[3] .'  FROM vol WHERE vol.idvol = ?';
+            }
+            else {
+                $req = "SELECT * FROM vol WHERE vol.idvol = ?";
+            }
 
             $res=$connect->prepare($req, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-            $res->execute(NULL);
+            $res->execute(array($req_data[2]) );
             $data = $res->fetchAll(PDO::FETCH_ASSOC);
             $data_json = json_encode($data);
             print_r($data_json);
@@ -151,6 +161,16 @@
             $data_json = json_encode($data);
             print_r($data_json);
         }
+        if(isset($req_data[1])&&$req_data[1]=='etat') {
+            $req = "SELECT * FROM etats";
+
+            $res=$connect->prepare($req, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+            $res->execute(NULL);
+            $data = $res->fetchAll(PDO::FETCH_ASSOC);
+            $data_json = json_encode($data);
+            print_r($data_json);
+        }
+
 
 
         // récup count

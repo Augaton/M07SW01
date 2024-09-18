@@ -104,3 +104,13 @@ header #dark_light{display:inline;width:30px;height: 30px;margin: 23px 10px;posi
 .tableau_statistique td.idgris
 {background-color: #F2F2F2;}
 .tableau_statistique input{width:100%;}
+
+secteur{
+	height: auto;
+	width:100%;
+}
+
+.menu_graphe label {
+	display: inline-block;
+	margin-right: 10px;
+}

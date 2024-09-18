@@ -20,9 +20,11 @@ function suiviAjax(){
         var nbutilisateur=recupererNombreUtilisateur();
         document.getElementsByClassName("statistique_valeur")[2].innerHTML = nbutilisateur;
 
-        document.getElementsByClassName("statistique_valeur")[0].addEventListener("click", recupererDonneesDrones);
-        document.getElementsByClassName("statistique_valeur")[1].addEventListener("click", recupererDonneesVols);
-        document.getElementsByClassName("statistique_valeur")[2].addEventListener("click", recupererDonneesUtilisateur);
+        //
+
+        document.getElementsByClassName("statistique")[0].addEventListener("click", recupererDonneesDrones);
+        document.getElementsByClassName("statistique")[1].addEventListener("click", recupererDonneesVols);
+        document.getElementsByClassName("statistique")[2].addEventListener("click", recupererDonneesUtilisateur);
     }
     };
     xhttp.open("GET", "mainDrone.html");
@@ -160,6 +162,42 @@ function recupererDonneesUtilisateur(){
     }
     };
     xhttp.open("GET", "rest.php/utilisateur",false);
+    xhttp.send();
+    return xhttp.onreadystatechange();
+}
+
+function getgraphdrone(){
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var reponseAPI = JSON.parse(this.responseText);
+
+        // graphe etat
+
+        const ctx = document.getElementById('grapheetat');
+
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets: [{
+              label: '# of Votes',
+              data: [12, 19, 3, 5, 2, 3],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+
+    }
+    };
+    xhttp.open("GET", "rest.php/etat",false);
     xhttp.send();
     return xhttp.onreadystatechange();
 }
