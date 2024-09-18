@@ -1,3 +1,5 @@
+// const { color } = require("chart.js/helpers");
+
 document.getElementById("nav_suivi").addEventListener("click", suiviAjax);
 
 // principal
@@ -29,7 +31,6 @@ function suiviAjax(){
     };
     xhttp.open("GET", "mainDrone.html");
     xhttp.send();
-
 }
 
 // fonction complémentaire
@@ -126,10 +127,16 @@ function recupererDonneesVols(){
         table+="<td>"+donneesVol.datevol+"</td>";
         table+="<td class='idgris'>"+donneesVol.iddrone+"</td>";
         table+="<td class='idgris'>"+donneesVol.idutilisateurs+"</td>";
+        table+='<td> <input type="button" value="Graphe" class="graphe"/> </td>'
         table+="</tr>";
         }
         table+="</table></div>";
         document.getElementById("section").innerHTML=table;
+
+        for(let i=0;i < reponseAPI.length;i++){
+            document.getElementsByClassName("graphe")[i].addEventListener("click", getgraphdrone);
+        }
+
     }
     };
     xhttp.open("GET", "rest.php/vol",false);
@@ -166,38 +173,77 @@ function recupererDonneesUtilisateur(){
     return xhttp.onreadystatechange();
 }
 
-function getgraphdrone(){
+// graphe
+
+function getgraphdrone(id){
+
     const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         var reponseAPI = JSON.parse(this.responseText);
 
-        // graphe etat
+        var table = '<canvas id="grapheetat"></canvas>'
+        document.getElementById("section").innerHTML=table;
 
-        const ctx = document.getElementById('grapheetat');
-
-        new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-              label: '# of Votes',
-              data: [12, 19, 3, 5, 2, 3],
-              borderWidth: 1
-            }]
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true
-              }
-            }
-          }
-        });
-
+        getgrapheetat(reponseAPI);
     }
     };
-    xhttp.open("GET", "rest.php/etat",false);
+    xhttp.open("GET", "rest.php/graphe/1",false);
     xhttp.send();
     return xhttp.onreadystatechange();
+}
+
+var x=[];var y1=[];var y2=[]; var leg1; var leg2; var col1; var col2
+
+function getgrapheetat(drone){
+
+    var dronetotal = drone.length;
+
+    for(let i = 0; i<dronetotal; i++)
+    {
+         y1[i] = drone[i].h
+         x[i] = drone[i].idetats
+    }
+
+    Graph(x,y1,"Hauteur","255,0,0")
+}
+
+let chart;
+
+function Graph(x, y1, leg1,  col1) {
+
+    const ctx = document.getElementById('grapheetat');
+
+    var data =  
+    {
+        type: 'line',
+        options: {scales:
+            {
+                h: {type: 'linear',display:true,position:'left'}
+            }
+        },
+        data: {
+            type: 'line',
+            labels: x,
+            datasets: 
+            [{ 
+                yAxisID: "h",
+                label: leg1,
+                data: y1,
+                borderColor: "rgb("+col1+")",
+                borderWidth: 1
+            }]
+
+        }
+    }
+
+    if(chart)
+    {
+        chart.destroy()
+        chart = new Chart(ctx, data);
+    }
+    else{
+        chart = new Chart(ctx, data);
+    }
+
 }

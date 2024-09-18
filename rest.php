@@ -133,6 +133,16 @@
             $data_json = json_encode($data);
             print_r($data_json);
         }
+        
+        if(isset($req_data[1])&&$req_data[1]=='vol') {
+            $req = "SELECT * FROM vol";
+
+            $res=$connect->prepare($req, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+            $res->execute(NULL);
+            $data = $res->fetchAll(PDO::FETCH_ASSOC);
+            $data_json = json_encode($data);
+            print_r($data_json);
+        }
         if(isset($req_data[1])&&$req_data[1]=='graphe') {
             if(!isset($req_data[2])) {
                 print_r('Manque ID');
@@ -140,10 +150,10 @@
             }
 
             if (isset($req_data[3])){
-                $req = 'SELECT '. $req_data[3] .'  FROM vol WHERE vol.idvol = ?';
+                $req = 'SELECT '. $req_data[3] .'  FROM etats WHERE etats.idvol = ?';
             }
             else {
-                $req = "SELECT * FROM vol WHERE vol.idvol = ?";
+                $req = "SELECT * FROM etats WHERE etats.idvol = ?";
             }
 
             $res=$connect->prepare($req, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
