@@ -149,8 +149,9 @@
                 break;
             }
 
+
             if (isset($req_data[3])){
-                $req = 'SELECT '. $req_data[3] .'  FROM etats WHERE etats.idvol = ?';
+                $req = 'SELECT '. $req_data[3] .' AS param, idetats FROM etats WHERE etats.idvol = ?';
             }
             else {
                 $req = "SELECT * FROM etats WHERE etats.idvol = ?";

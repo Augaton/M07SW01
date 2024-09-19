@@ -35,8 +35,10 @@
       <div></div>
     </nav>
 
+    <div id="style">
     <section id="section">
     </section>
+    </div>
     
     <footer id="mon_footer">
       <div>

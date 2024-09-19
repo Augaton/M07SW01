@@ -134,7 +134,10 @@ function recupererDonneesVols(){
         document.getElementById("section").innerHTML=table;
 
         for(let i=0;i < reponseAPI.length;i++){
-            document.getElementsByClassName("graphe")[i].addEventListener("click", getgraphdrone);
+            document.getElementsByClassName("graphe")[i].addEventListener("click", function (){
+                getgraphdrone( reponseAPI[i].idvol, "h" )
+                
+            });
         }
 
     }
@@ -175,25 +178,77 @@ function recupererDonneesUtilisateur(){
 
 // graphe
 
-function getgraphdrone(id){
+function getgraphdrone(idvol,options){
+    var id = idvol
 
     const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
+        
         var reponseAPI = JSON.parse(this.responseText);
 
-        var table = '<canvas id="grapheetat"></canvas>'
+        var table="<div ><table class='tableau_statistique '><tr class='centrer'>";
+
+        table+="<th>Pitch</th>";
+        table+="<th>Roll</th>";
+        table+="<th>Yaw</th>";
+        table+="<th>VGX</th>";
+        table+="<th>VGY</th>";
+        table+="<th>VGZ</th>";
+        table+="<th>TempL</th>";
+        table+="<th>TempH</th>";
+        table+="<th>TOF</th>";
+        table+="<th>H</th>";
+        table+="<th>Bat</th>";
+        table+="<th>Baro</th>";
+        table+="<th>Time</th>";
+        table+="<th>AGX</th>";
+        table+="<th>AGY</th>";
+        table+="<th>AGZ</th></tr>";
+
+        table+="<tr class='centrer'>";
+        table+='<td><input type="checkbox" id="pitch" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="roll" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="yaw" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="vgx" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="vgy" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="vgz" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="templ" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="temph" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="tof" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="h" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="bat" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="baro" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="time" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="agx" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="agy" class="checkboxgraphe" ></input></td>';
+        table+='<td><input type="checkbox" id="agz" class="checkboxgraphe" ></input></td>';
+        table+="</tr>";
+        table+="</table></div>";
+
+        table += '<canvas id="grapheetat"></canvas>';
         document.getElementById("section").innerHTML=table;
 
+        for(let i=0;i < 16;i++){
+            document.getElementsByClassName("checkboxgraphe")[i].addEventListener("click", function (graphe){
+                getgraphdrone( id, graphe.currentTarget.id )
+            });
+        }
+
         getgrapheetat(reponseAPI);
+    
     }
     };
-    xhttp.open("GET", "rest.php/graphe/1",false);
+    if (options){
+        xhttp.open("GET", "rest.php/graphe/" + id + "/" + options,false);
+    }else{
+        xhttp.open("GET", "rest.php/graphe/" + id,false);
+    } 
     xhttp.send();
     return xhttp.onreadystatechange();
 }
 
-var x=[];var y1=[];var y2=[]; var leg1; var leg2; var col1; var col2
+var x=[];var y1=[]; var leg1; var col1
 
 function getgrapheetat(drone){
 
@@ -201,8 +256,8 @@ function getgrapheetat(drone){
 
     for(let i = 0; i<dronetotal; i++)
     {
-         y1[i] = drone[i].h
-         x[i] = drone[i].idetats
+        y1[i] = drone[i].param
+        x[i] = (drone[i].idetats - drone[0].idetats) / 10
     }
 
     Graph(x,y1,"Hauteur","255,0,0")
