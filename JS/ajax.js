@@ -189,40 +189,22 @@ function getgraphdrone(idvol,options){
 
         var table="<div ><table class='tableau_statistique '><tr class='centrer'>";
 
-        table+="<th>Pitch</th>";
-        table+="<th>Roll</th>";
-        table+="<th>Yaw</th>";
-        table+="<th>VGX</th>";
-        table+="<th>VGY</th>";
-        table+="<th>VGZ</th>";
-        table+="<th>TempL</th>";
-        table+="<th>TempH</th>";
-        table+="<th>TOF</th>";
-        table+="<th>H</th>";
-        table+="<th>Bat</th>";
-        table+="<th>Baro</th>";
-        table+="<th>Time</th>";
-        table+="<th>AGX</th>";
-        table+="<th>AGY</th>";
-        table+="<th>AGZ</th></tr>";
+        const array1 = ['pitch', 'roll', 'yaw','vgx','vgy','vgz','templ','temph','tof','h','bat','baro','time','agx','agy','agz'];
+
+        array1.forEach((element) => {
+            table+='<th>'+element+'</th>';
+        }
+        );
+
+        table+="</tr>";
 
         table+="<tr class='centrer'>";
-        table+='<td><input type="checkbox" id="pitch" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="roll" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="yaw" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="vgx" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="vgy" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="vgz" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="templ" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="temph" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="tof" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="h" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="bat" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="baro" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="time" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="agx" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="agy" class="checkboxgraphe" ></input></td>';
-        table+='<td><input type="checkbox" id="agz" class="checkboxgraphe" ></input></td>';
+
+        array1.forEach((element) => {
+            table+='<td><input type="checkbox" id="'+element+'" class="checkboxgraphe" ></input></td>';
+        }
+        );
+
         table+="</tr>";
         table+="</table></div>";
 
@@ -231,11 +213,11 @@ function getgraphdrone(idvol,options){
 
         for(let i=0;i < 16;i++){
             document.getElementsByClassName("checkboxgraphe")[i].addEventListener("click", function (graphe){
-                getgraphdrone( id, graphe.currentTarget.id )
+                modifygraph( id, graphe )
             });
         }
 
-        getgrapheetat(reponseAPI);
+        getgrapheetat(reponseAPI,options);
     
     }
     };
@@ -248,11 +230,83 @@ function getgraphdrone(idvol,options){
     return xhttp.onreadystatechange();
 }
 
-var x=[];var y1=[]; var leg1; var col1
+var x=[];; var leg1; var col1
 
-function getgrapheetat(drone){
+function random_rgba() {
+    var o = Math.round, r = Math.random, s = 255;
+    return o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s);
+}
+
+function modifygraph(idvol,options) {
+    var checked = options.currentTarget.checked
+    var idtarget = options.currentTarget.id
+    var id = idvol
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        
+        var reponseAPI = JSON.parse(this.responseText);
+
+        var detect = false;
+
+        var dronetotal = reponseAPI.length;
+
+        if (!checked) {
+
+            chart.data.datasets = chart.data.datasets.filter(function(obj) {
+                return (obj.label != idtarget); 
+            });
+            // Repaint
+            chart.update(); 
+            return
+        }
+
+        chart.data.datasets.forEach(dataset => {
+            if (dataset.label == idtarget) {
+                detect = true
+            }
+        });
+        if (detect == true){
+            return
+        }
+
+        let y1=[]
+
+        for(let i = 0; i<dronetotal; i++)
+        {
+            y1[i] = reponseAPI[i].param
+            x[i] = (reponseAPI[i].idetats - reponseAPI[0].idetats) / 10
+        }
+
+        var color = random_rgba()
+
+        const newDataset = {
+            yAxisID: "h",
+            label: idtarget,
+            borderColor: "rgb("+color+")",
+            borderWidth: 1,
+            data: y1,
+        };
+        chart.data.datasets.push(newDataset);
+        chart.update();
+    
+    }
+    };
+    if (idtarget){
+        xhttp.open("GET", "rest.php/graphe/" + id + "/" + idtarget,false);
+    }else{
+        console.log("mauvais lien")
+    } 
+    xhttp.send();
+    return xhttp.onreadystatechange();
+}
+
+function getgrapheetat(drone,name){
 
     var dronetotal = drone.length;
+
+    let y1=[]
 
     for(let i = 0; i<dronetotal; i++)
     {
@@ -260,14 +314,17 @@ function getgrapheetat(drone){
         x[i] = (drone[i].idetats - drone[0].idetats) / 10
     }
 
-    Graph(x,y1,"Hauteur","255,0,0")
+    var color = random_rgba()
+
+    Graph(x,y1,name,color)
 }
 
-let chart;
+var chart;
 
 function Graph(x, y1, leg1,  col1) {
 
     const ctx = document.getElementById('grapheetat');
+    
 
     var data =  
     {
@@ -287,7 +344,7 @@ function Graph(x, y1, leg1,  col1) {
                 data: y1,
                 borderColor: "rgb("+col1+")",
                 borderWidth: 1
-            }]
+            },]
 
         }
     }
